@@ -1,0 +1,28 @@
+=meta: 0.0.2
+
+name: Swim
+version: 0.0.1
+abstract: See What I Mean?!
+homepage: http://swimtext.org
+language: perl
+license: perl
+copyright: 2015
+
+author:
+  name: Ingy döt Net
+  email: ingy@cpan.org
+  homepage: http://ingy.net
+  github: ingydotnet
+  twitter: ingydotnet
+  freenode: ingy
+
+devel:
+  git: https://github.com/ingydotnet/swim-js
+  bug: https://github.com/ingydotnet/swim-js/issues
+  irc: irc.freenode.net#swimtext
+
+requires:
+  nodejs: 0
+  coffee-script: 0
+
+badge: travis
