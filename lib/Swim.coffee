@@ -30,6 +30,7 @@ class global.Swim
     @convert(Swim.Markdown)
 
   to_html: ->
+    require './Swim/HTML'
     @convert(Swim.HTML)
 
   to_txt: ->

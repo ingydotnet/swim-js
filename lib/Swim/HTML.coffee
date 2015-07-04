@@ -1,200 +1,166 @@
-package Swim::HTML;
-use Pegex::Base;
-extends 'Swim::Markup';
+global.Swim ?= class
+global.Swim.Markup ?= class
 
-use HTML::Escape;
+class (global.Swim?=->).HTML extends Swim.Markup
+  constructor: ->
+    throw "xyz"
+  top_block_separator: "\n"
 
-use constant top_block_separator => "\n";
+  document_title: ''
 
-my $document_title = '';
-my $info = {
-    verse => {
-        tag => 'p',
-        style => 'block',
-        transform => 'transform_verse',
-        attrs => ' class="verse"',
-    },
-};
+  info:
+    verse:
+      tag: 'p'
+      style: 'block'
+      transform: 'transform_verse'
+      attrs: ' class="verse"'
 
-sub render_text {
-    my ($self, $text) = @_;
-    $text =~ s/\n/ /g;
-    escape_html($text);
-}
+  render_text: (text)->
+    test = text.replace /\n/, " "
+    @escape_html text
 
-sub render_para {
-    my ($self, $node) = @_;
-    my $out = $self->render($node);
-    chomp $out;
-    my $spacer = $out =~ /\n/ ? "\n" : '';
-    "<p>$spacer$out$spacer</p>\n";
-}
+  render_para: (node)->
+    out = @render(node)
+    out = out.replace /\n$/, ''
+    spacer = if out.match /\n/ then "\n" else ''
+    "<p>#{spacer}#{out}#{spacer}</p>\n"
 
-sub render_rule {
-    "<hr/>\n";
-}
+  render_rule:
+    "<hr/>\n"
 
-sub render_blank {
-    "<br/>\n";
-}
+  render_blank:
+    "<br/>\n"
 
-sub render_list {
-    my ($self, $node) = @_;
-    my $out = $self->render($node);
-    chomp $out;
-    "<ul>\n$out\n</ul>\n";
-}
+  render_list: (node)->
+    out = @render(node)
+    out = out.replace /\n$/, ""
+    "<ul>\n#{out}\n</ul>\n"
 
-sub render_item {
-    my ($self, $node) = @_;
-    my $out = $self->render($node);
-    $out =~ s/(.)(<(?:ul|pre|p)(?: |>))/$1\n$2/;
-    my $spacer = $out =~ /\n/ ? "\n" : '';
-    "<li>$out$spacer</li>\n";
-}
+  render_item: (node)->
+    out = @render(node)
+    out = out.replace /(.)(<(?:ul|pre|p)(?: |>))/, "\$1\n\$2"
+    spacer = if out.match /\n/ then "\n" else ''
+    "<li>#{out}#{spacer}</li>\n"
 
-sub render_olist {
-    my ($self, $node) = @_;
-    my $out = $self->render($node);
-    chomp $out;
-    "<ol>\n$out\n</ol>\n";
-}
+  render_olist: (node)->
+    out = @render(node)
+    out = out.replace /\n$/, ""
+    "<ol>\n#{out}\n</ol>\n"
 
-sub render_oitem {
-    my ($self, $node) = @_;
-    $self->render_item($node);
-}
+  render_oitem: (node)->
+    @render_item(node)
 
-sub render_data {
-    my ($self, $node) = @_;
-    my $out = "<dl>\n";
-    for my $item (@$node) {
-        my ($term, $def, $rest) = @$item;
-        $term = $self->render($term);
-        $out .= "<dt>$term</dt>\n";
-        if (length $def or $rest) {
-            $out .= "<dd>";
-            if (length $def) {
-                $out .= $self->render($def) . "\n";
-            }
-            if ($rest) {
-                $out .= $self->render($rest) . "\n";
-            }
-            $out .= "<dd>\n";
-        }
-    }
-    $out . "</dl>\n";
-}
+  render_data: (node)->
+    out = "<dl>\n"
+    for item in node
+      [item, def, rest] = item
+      term = @render(term)
+      out += "<dt>#{term}</dt>\n"
+      if def.length || rest
+        out += "<dd>"
+        if def.length
+          out += @render(def) + "\n"
+        if rest
+          out += @render(rest) + "\n"
+        out += "<dd>\n"
+    out + "</dl>\n"
 
-sub render_pref {
-    my ($self, $node) = @_;
-    my $out = escape_html($node);
-    "<pre><code>$out\n</code></pre>\n";
-}
+  render_pref: (node)->
+    out = escape_html($node)
+    "<pre><code>$out\n</code></pre>\n"
 
-sub render_pfunc {
-    my ($self, $node) = @_;
-    if ($node =~ /^(\w[\-\w]*) ?((?s:.*)?)$/) {
-        my ($name, $args) = ($1, $2);
-        $name =~ s/-/_/g;
-        my $method = "phrase_func_$name";
-        if ($self->can($method)) {
-            my $out = $self->$method($args);
-            return $out if defined $out;
-        }
-    }
-    "&lt;$node&gt;";
-}
 
-sub render_title {
-    my ($self, $node) = @_;
-    my ($name, $abstract) = ref $node ? @$node : (undef, $node);
+  render_pfunc: (node)->
+    if node.match /^(\w[\-\w]*) ?((?s:.*)?)$/
+      [name, args] = [RegExp.$1, RegExp.$2]
+      name = name.replace /-/g, "-"
+      method = "phrase_func_#{name}"
+      if @[method]?
+        out = @[method](args)
+        return out if out?
+    "&lt;#{node}&gt;"
 
-    $name = $self->render($name);
-    if (defined $abstract) {
-        $abstract = $self->render($abstract);
-        $document_title = "$name - $abstract";
-        "<h1 class=\"title\">$name</h1>\n\n<p>$abstract</p>\n";
-    }
+
+###
+  render_title: (node)->
+    [name, abstract] = if typeof node == 'object' \
+      then node else [null, node]
+    name = @render(name)
+    if abstract?
+        abstract = @render(abstract)
+        document_title = "#{name} - #{abstract}"  # how was this before?
+        "<h1 class=\"title\">#{name}</h1>\n\n<p>#{abstract}</p>\n"
+
     else {
-        $document_title = "$name";
-        my $spacer = $name =~ /\n/ ? "\n" : '';
-        "<h1 class=\"title\">$spacer$name$spacer</h1>\n";
-    }
-}
+        $document_title = "$name"
+        spacer = $name =~ /\n/ ? "\n" : ''
+        "<h1 class=\"title\">$spacer$name$spacer</h1>\n"
 
-sub render_head {
-    my ($self, $node, $number) = @_;
-    my $out = $self->render($node);
-    chomp $out;
-    "<h$number>$out</h$number>\n";
-}
 
-sub render_comment {
-    my ($self, $node) = @_;
-    my $out = escape_html($node);
+
+  render_head {
+    my ($self, $node, $number) = @_
+    out = @render($node)
+    chomp $out
+    "<h$number>$out</h$number>\n"
+
+
+  render_comment: (node)->
+    out = escape_html($node)
     if ($out =~ /\n/) {
-        "<!--\n$out\n-->\n";
-    }
+        "<!--\n$out\n-->\n"
+
     else {
-        "<!-- $out -->\n";
-    }
-}
+        "<!-- $out -->\n"
 
-sub render_code {
-    my ($self, $node) = @_;
-    my $out = $self->render($node);
-    "<code>$out</code>";
-}
 
-sub render_bold {
-    my ($self, $node) = @_;
-    my $out = $self->render($node);
-    "<strong>$out</strong>";
-}
 
-sub render_emph {
-    my ($self, $node) = @_;
-    my $out = $self->render($node);
-    "<em>$out</em>";
-}
+  render_code: (node)->
+    out = @render($node)
+    "<code>$out</code>"
 
-sub render_del {
-    my ($self, $node) = @_;
-    my $out = $self->render($node);
-    "<del>$out</del>";
-}
 
-sub render_under {
-    my ($self, $node) = @_;
-    my $out = $self->render($node);
-    "<u>$out</u>";
-}
+  render_bold: (node)->
+    out = @render($node)
+    "<strong>$out</strong>"
 
-sub render_hyper {
-    my ($self, $node) = @_;
-    my ($link, $text) = @{$node}{qw(link text)};
-    $text = $link if not length $text;
-    "<a href=\"$link\">$text</a>";
-}
 
-sub render_link {
-    my ($self, $node) = @_;
-    my ($link, $text) = @{$node}{qw(link text)};
-    $text = $link if not length $text;
+  render_emph: (node)->
+    out = @render($node)
+    "<em>$out</em>"
+
+
+  render_del: (node)->
+    out = @render($node)
+    "<del>$out</del>"
+
+
+  render_under: (node)->
+    out = @render($node)
+    "<u>$out</u>"
+
+
+  render_hyper: (node)->
+    my ($link, $text) = @{$node}{qw(link text)}
+    $text = $link if not length $text
+    "<a href=\"$link\">$text</a>"
+
+
+  render_link: (node)->
+    my ($link, $text) = @{$node}{qw(link text)}
+    $text = $link if not length $text
 
     # XXX Temporary hack for inline grant blog
     # We can solve this in a formal and extensible way later.
     if (defined $ENV{SWIM_LINK_FORMAT_HACK}) {
-        $link = "https://metacpan.org/pod/$link";
-    }
+        $link = "https://metacpan.org/pod/$link"
 
-    "<a href=\"$link\">$text</a>";
-}
 
-sub render_complete {
-    my ($self, $out) = @_;
-    chomp $out;
+    "<a href=\"$link\">$text</a>"
+
+
+  render_complete: (out)->
+    chomp $out
     <<"..."
 <!DOCTYPE html>
 <html>
@@ -212,67 +178,62 @@ $out
 </body>
 </html>
 ...
-}
+
 
 #------------------------------------------------------------------------------
-sub format_phrase_func_html {
-    my ($self, $tag, $class, $attrib, $content) = @_;
-    my $attribs = '';
+  format_phrase_func_html {
+    my ($self, $tag, $class, $attrib, $content) = @_
+    attribs = ''
     if (@$class) {
-        $attribs = ' class="' . join(' ', @$class) . '"';
-    }
+        $attribs = ' class="' . join(' ', @$class) . '"'
+
     if (@$attrib) {
         $attribs = ' ' . join(' ', map {
             /=".*"$/ ? $_ : do { s/=(.*)/="$1"/; $_ }
-        } @$attrib);
-    }
+        } @$attrib)
+
     length($content)
     ? "<$tag$attribs>$content</$tag>"
-    : "<$tag$attribs/>";
-}
+    : "<$tag$attribs/>"
 
-sub phrase_func_bold {
-    my ($self, $args) = @_;
+
+  phrase_func_bold: (args)->
     my ($success, $class, $attrib, $content) =
-        $self->parse_phrase_func_args_html($args);
-    return unless $success;
-    $self->format_phrase_func_html('strong', $class, $attrib, $content);
-}
+        @parse_phrase_func_args_html($args)
+    return unless $success
+    @format_phrase_func_html('strong', $class, $attrib, $content)
 
-sub parse_phrase_func_args_html {
-    my ($self, $args) = @_;
-    my ($class, $attrib, $content) = ([], [], '');
-    $args =~ s/^ //;
+
+  parse_phrase_func_args_html: (args)->
+    my ($class, $attrib, $content) = ([], [], '')
+    $args =~ s/^ //
     if ($args =~ /\A((?:\\:|[^\:])*):((?s:.*))\z/) {
-        $attrib = $1;
-        $content = $2;
-        $attrib =~ s/\\:/:/g;
-        ($class, $attrib) = $self->parse_attrib($attrib);
-    }
+        $attrib = $1
+        $content = $2
+        $attrib =~ s/\\:/:/g
+        ($class, $attrib) = @parse_attrib($attrib)
+
     else {
-        $content = $args;
-    }
-    return 1, $class, $attrib, $content;
-}
+        $content = $args
 
-sub parse_attrib {
-    my ($self, $text) = @_;
-    my ($class, $attrib) = ([], []);
+    return 1, $class, $attrib, $content
+
+
+  parse_attrib: (text)->
+    my ($class, $attrib) = ([], [])
     while (length $text) {
-        if ($text =~ s/^\s*(\w[\w\-]*)(?=\s|\z)\s*//) {
-            push @$class, $1;
-        }
-        elsif ($text =~ s/^\s*(\w[\w\-]*="[^"]*")(?=\s|\z)s*//) {
-            push @$attrib, $1;
-        }
-        elsif ($text =~ s/^\s*(\w[\w\-]*=\S+)(?=\s|\z)s*//) {
-            push @$attrib, $1;
-        }
-        else {
-            last;
-        }
-    }
-    return $class, $attrib;
-}
+        if ($text =~ s/^\s*(\w[\w\-]*)(?=\s|\z)\s*XXX//) {
+            push @$class, $1
 
-1;
+        elsif ($text =~ s/^\s*(\w[\w\-]*="[^"]*")(?=\s|\z)s*XXX//) {
+            push @$attrib, $1
+
+        elsif ($text =~ s/^\s*(\w[\w\-]*=\S+)(?=\s|\z)s*XXX//) {
+            push @$attrib, $1
+
+        else {
+            last
+
+
+    return $class, $attrib
+###
