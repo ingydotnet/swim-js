@@ -1,19 +1,15 @@
 #!/usr/bin/env coffee
 
-require('app-module-path').addPath '/home/ingy/src/pegex-js/lib'
+require './lib/Prelude'
 require './lib/Swim'
-yaml = require 'js-yaml'
-global.say = console.log
-global.xxx = (o)->
-  say yaml.dump o
-  process.exit 1
 
-text = "\
+text = """\
 == Swim is Great!
 
 * You
 * Know
 * It
-"
-swim = new Swim(text: text)
+
+"""
+swim = new Swim(text)
 console.log swim.to_html()

@@ -1,18 +1,12 @@
-require 'Pegex/Parser'
-require './Swim/Grammar'
-
-class global.Swim
+class Swim
   VERSION: '0.0.1'
 
-  constructor: ->
-    @text = null
+  constructor: (@text)->
     @meta = {}
     @option = {}
-    @debug = false
+    @debug = true
 
   convert: (receiver_class)->
-    require receiver_class
-
     parser = new Pegex.Parser(
       grammar: new Swim.Grammar()
       receiver: new receiver_class(
@@ -103,4 +97,7 @@ class global.Swim
 #   $out;
 # }
 
-1;
+global.Swim = Swim
+require 'Pegex/Parser'
+require './Swim/Grammar'
+

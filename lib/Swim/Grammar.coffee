@@ -1,6 +1,6 @@
 require 'Pegex/Grammar'
 
-class (global.Swim?=->).Grammar extends Pegex.Grammar
+class Swim.Grammar extends Pegex.Grammar
   file: '../swim-pm/ext/swim-pgx/swim.pgx'
 
   start_rules: [

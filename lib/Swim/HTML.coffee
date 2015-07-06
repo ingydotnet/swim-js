@@ -1,9 +1,7 @@
-global.Swim ?= class
 global.Swim.Markup ?= class
 
-class (global.Swim?=->).HTML extends Swim.Markup
+class global.Swim.HTML extends Swim.Markup
   constructor: ->
-    throw "xyz"
   top_block_separator: "\n"
 
   document_title: ''
