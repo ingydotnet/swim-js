@@ -1,5 +1,5 @@
+require('app-module-path').addPath '../pegex-js/lib'
 modules = [
-../lib
   'Swim'
   'Swim/Grammar'
   'Swim/Command'

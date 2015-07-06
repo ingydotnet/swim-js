@@ -1,4 +1,4 @@
-require('app-module-path').addPath '/home/ingy/src/pegex-js/lib'
+require('app-module-path').addPath '../pegex-js/lib'
 yaml = require 'js-yaml'
 global.say = console.log
 global.xxx = (o)->
