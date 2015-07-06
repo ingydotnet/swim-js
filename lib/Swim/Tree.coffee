@@ -1,8 +1,10 @@
-package Swim::Tree;
-use Pegex::Base;
-extends 'Pegex::Tree';
+require 'Pegex/Tree'
+class Swim.Tree extends Pegex.Tree
 
-has meta => {};
+  constructor: ->
+    @meta = {}
+
+###
 
 sub got_block_func {
     my ($self, $content) = @_;
@@ -251,3 +253,4 @@ sub collapse {
 }
 
 1;
+###

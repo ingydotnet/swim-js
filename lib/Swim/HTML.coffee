@@ -1,4 +1,5 @@
 global.Swim.Markup ?= class
+require '../Swim/Markup'
 
 class global.Swim.HTML extends Swim.Markup
   constructor: ->

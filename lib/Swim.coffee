@@ -4,7 +4,7 @@ class Swim
   constructor: (@text)->
     @meta = {}
     @option = {}
-    @debug = true
+    @debug = false
 
   convert: (receiver_class)->
     parser = new Pegex.Parser(

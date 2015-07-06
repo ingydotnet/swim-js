@@ -1,13 +1,9 @@
-package Swim::Markup;
-use Pegex::Base;
-extends 'Swim::Tree';
+require '../Swim/Tree'
+class Swim.Markup extends Swim.Tree
+  constructor: ->
+    @option = {}
 
-has option => {};
-
-sub BUILD {
-    $_[0]->{option} ||= {};
-}
-
+###
 sub final {
     my ($self, $tree) = @_;
     $self->{stack} = [];
@@ -20,23 +16,19 @@ sub final {
     }
     $out;
 }
+###
 
-sub render {
-    my ($self, $node) = @_;
-    my $out;
-    if (not ref $node) {
-        $out = $self->render_text($node);
-    }
-    elsif (ref($node) eq 'HASH') {
-        $out = $self->render_node($node);
-    }
-    else {
-        my $separator = $self->get_separator($node);
-        $out = join $separator, grep $_, map { $self->render($_) } @$node;
-    }
-    return $out;
-}
+# render = (node)->
+#   if (typeof ref == String) {
+#     out = @render_text node
+#   else if (ref($node) eq 'HASH') {
+#     out = $self->render_node($node);
+#   else {
+#     separator = $self->get_separator($node);
+#     out = join $separator, grep $_, map { $self->render($_) } @$node;
+#   return $out;
 
+###
 sub render_node {
     my ($self, $hash) = @_;
     my ($name, $node) = each %$hash;
@@ -84,7 +76,7 @@ sub _render_func {
         }
         last if $plugin eq "Swim::Plugin";
         eval "require $plugin";
-        $plugin =~ s/(.*)::.*/$1/;
+        $plugin =~ s/(.*)::.*XXX/$1/;
     }
     return;
 }
@@ -124,3 +116,4 @@ sub node_is_block {
 }
 
 1;
+###
