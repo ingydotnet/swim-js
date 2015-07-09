@@ -1,9 +1,9 @@
 #!/usr/bin/env coffee
 
-require './lib/Prelude'
+require './test/lib/Prelude'
 require './lib/Swim'
 
-text = """\
+text = """
 == Swim is Great!
 
 * You
@@ -11,5 +11,6 @@ text = """\
 * It
 
 """
+say ">>>#{text}<<<"
 swim = new Swim(text)
-console.log swim.to_html()
+say swim.to_html()

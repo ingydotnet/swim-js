@@ -2,7 +2,8 @@ global.Swim.Markup ?= class
 require '../Swim/Markup'
 
 class global.Swim.HTML extends Swim.Markup
-  constructor: ->
+  # constructor: ->
+
   top_block_separator: "\n"
 
   document_title: ''

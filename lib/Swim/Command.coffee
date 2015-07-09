@@ -1,18 +1,17 @@
-use strict; use warnings;
-package Swim::Command;
-use Pegex::Base;
+require '../Swim'
+require '../Swim/Util'
+# use FindBin;
+# use Getopt::Long;
 
-use Swim;
-use Swim::Util;
-use FindBin;
-use Getopt::Long;
+class Swim.Command
+  constructor: ->
+    @argv = []
+    @to = 'html'
+    @meta = {}
+    @option = {}
+    @debug = false
 
-has argv => ();
-has to => 'html';
-has meta => {};
-has option => {};
-has debug => 0;
-
+###
 sub usage {
   print <<'...';
 Usage:
@@ -92,3 +91,4 @@ sub meta_opt {
 }
 
 1;
+###

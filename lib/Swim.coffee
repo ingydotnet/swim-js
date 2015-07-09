@@ -7,13 +7,18 @@ class Swim
     @debug = false
 
   convert: (receiver_class)->
+    receiver = new receiver_class(
+      meta: @meta,
+      option: @option,
+    )
+    xxx receiver.final()
     parser = new Pegex.Parser(
       grammar: new Swim.Grammar()
       receiver: new receiver_class(
         meta: @meta,
         option: @option,
-      ),
-      debug: @debug,
+      )
+      debug: @debug
     )
     parser.parse(@text)
 

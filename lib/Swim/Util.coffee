@@ -1,3 +1,4 @@
+###
 use strict; use warnings;
 package Swim::Util;
 use Encode;
@@ -35,3 +36,4 @@ sub slurp {
 }
 
 1;
+###

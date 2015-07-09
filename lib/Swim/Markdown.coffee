@@ -1,3 +1,4 @@
+###
 use strict; use warnings;
 package Swim::Markdown;
 
@@ -114,3 +115,4 @@ sub render_link {
 }
 
 1;
+###
