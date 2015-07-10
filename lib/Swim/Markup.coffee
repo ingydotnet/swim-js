@@ -1,8 +1,9 @@
 require '../Swim/Tree'
 _ = require 'underscore'
+
 class Swim.Markup extends Swim.Tree
   constructor: ->
-    @option = {}
+    @option ?= {}
 
   final: (tree)->
     @stack = []
@@ -31,16 +32,19 @@ class Swim.Markup extends Swim.Tree
       die node
     return out
 
-# render_node = ->
-#     my ($self, $hash) = @_;
-#     my ($name, $node) = each %$hash;
-#     my $number = $name =~ s/(\d)$// ? $1 : 0;
-#     my $method = "render_$name";
-#     push @{$self->{stack}}, $name;
-#     my $out = $self->$method($node, $number);
-#     pop @{$self->{stack}};
-#     $out;
-# 
+  render_node: (hash)->
+    for name, node of hash
+      break
+    number = 0
+    if name.match /(\d)$/
+      number = RegExp.$1
+      name = name.replace /(\d)$/, ''
+    method = "render_#{name}"
+    @stack.push name
+    out = @[method](node, number)
+    @stack.pop
+    out
+
 # render_pfunc = ->
 #     my ($self, $node) = @_;
 #     if ($node =~ /^([\-\w]+)(?:[\ \:]|\z)((?s:.*)?)$/) {
@@ -94,7 +98,7 @@ class Swim.Markup extends Swim.Tree
   top_block_separator: ''
 
   get_separator: (node)->
-    if @at_top_level \
+    if @at_top_level() \
       then @top_block_separator \
       else @default_separator
 

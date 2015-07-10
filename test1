@@ -12,6 +12,5 @@ text = """
 
 """
 
-say ">>>#{text}<<<"
 swim = new Swim(text)
 say swim.to_html()

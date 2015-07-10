@@ -15,7 +15,7 @@ class global.Swim.HTML extends Swim.Markup
       attrs: ' class="verse"'
 
   render_text: (text)->
-    text = text.replace /\n/, " "
+    text = text.replace /\n/g, ' '
     _.escape text
 
   render_para: (node)->
